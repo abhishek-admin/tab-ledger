@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Ledger</title>
+  <link rel="stylesheet" href="popup.css">
+  <style>
+    :root {
+      --accent: #a78bfa;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 3px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #666680;
+      background: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .nav-tab.active {
+      color: var(--accent-light);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+    }
+
+    .sessions-empty {
+      font-size: 12px;
+      color: #555568;
+      text-align: center;
+      padding: 30px 0;
+      line-height: 1.7;
+    }
+
+    .sessions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 390px;
+      overflow-y: auto;
+    }
+
+    .sessions-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sessions-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sessions-list::-webkit-scrollbar-thumb {
+      background: var(--accent-glow);
+      border-radius: 2px;
+    }
+
+    .session-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      transition: border-color 0.2s;
+    }
+
+    .session-card:hover {
+      border-color: var(--accent-border);
+    }
+
+    .session-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e0e0e8;
+      margin-bottom: 2px;
+    }
+
+    .session-meta {
+      font-size: 11px;
+      color: #555568;
+      margin-bottom: 7px;
+    }
+
+    .session-preview {
+      font-size: 11px;
+      color: #8888a0;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .session-btns {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-restore {
+      flex: 1;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-restore:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-view-summary {
+      padding: 5px 8px;
+      font-size: 11px;
+      color: #8888a0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-view-summary:hover {
+      color: #e0e0e8;
+    }
+
+    .btn-del {
+      padding: 5px 7px;
+      font-size: 11px;
+      color: #444455;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-del:hover {
+      color: #ff6b6b;
+      border-color: rgba(255, 107, 107, 0.3);
+    }
+
+    .save-toast {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      background: rgba(167, 139, 250, 0.08);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--accent-light);
+      margin-top: 8px;
+    }
+
+    .save-toast-link {
+      margin-left: auto;
+      background: none;
+      border: none;
+      font-size: 11px;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <span class="logo">✦</span>
+        <h1>Tab Ledger</h1>
+      </div>
+      <div class="header-right">
+        <span class="badge">Gemini</span>
+        <button id="settings-btn" class="settings-btn" title="API Settings">⚙</button>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="analyze">Analyze</button>
+      <button class="nav-tab" data-tab="sessions">Sessions</button>
+    </div>
+
+    <!-- Analyze View -->
+    <div id="analyze-view">
+      <div id="main-content">
+        <p class="subtitle">AI reads your open tabs, surfaces what matters, and logs a summary you can restore anytime.</p>
+        <button id="action-btn" class="primary-btn">
+          <span class="btn-text">📒 Log Session</span>
+        </button>
+      </div>
+
+      <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <p class="loading-text" id="loading-text">Scoring your tabs...</p>
+      </div>
+
+      <div id="result" class="hidden">
+        <div class="result-header">
+          <span>Session Analysis</span>
+          <div class="result-actions">
+            <button id="copy-btn" class="copy-btn" title="Copy">📋</button>
+          </div>
+        </div>
+        <div id="result-content" class="result-content"></div>
+        <div id="save-toast" class="save-toast hidden">
+          <span>✅</span>
+          <span id="save-toast-text">Session saved</span>
+          <button id="view-sessions-link" class="save-toast-link">View Sessions →</button>
+        </div>
+        <button id="rerun-btn" class="rerun-btn">📒 Re-log Session</button>
+      </div>
+
+      <div id="error" class="hidden">
+        <p class="error-text" id="error-message">Something went wrong.</p>
+        <button id="retry-btn" class="secondary-btn">Retry</button>
+      </div>
+    </div>
+
+    <!-- Sessions View -->
+    <div id="sessions-view" class="hidden">
+      <div id="sessions-list" class="sessions-list"></div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="hidden">
+      <div class="settings-header">
+        <span>API Settings</span>
+        <button id="settings-close" class="settings-close">✕</button>
+      </div>
+      <div class="settings-body">
+        <label class="settings-label">Gemini API Key</label>
+        <div class="settings-row">
+          <input type="password" id="gemini-key-input" class="settings-input" placeholder="Paste Gemini key..." />
+          <button id="toggle-gemini-key" class="toggle-vis-btn">👁</button>
+        </div>
+        <label class="settings-label">OpenRouter API Key <span class="settings-hint">(fallback)</span></label>
+        <div class="settings-row">
+          <input type="password" id="openrouter-key-input" class="settings-input"
+            placeholder="Paste OpenRouter key..." />
+          <button id="toggle-openrouter-key" class="toggle-vis-btn">👁</button>
+        </div>
+        <div class="settings-actions">
+          <button id="save-keys-btn" class="primary-btn" style="padding:8px 12px;font-size:12px;">Save Keys</button>
+          <button id="clear-keys-btn" class="secondary-btn">Clear All Keys</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Built by <a href="https://x.com/happy_ships" target="_blank">@happy_ships</a></span>
+      <span>Day 1/180</span>
+    </div>
+  </div>
+
+  <script src="gemini.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

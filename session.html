@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Summary — Tab Ledger</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      color: #e0e0e8;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 36px 24px 72px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .header-left { flex: 1; min-width: 0; }
+
+    .brand {
+      font-size: 11px;
+      color: #444455;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .session-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      line-height: 1.3;
+      outline: none;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+      transition: border-color 0.2s;
+      cursor: text;
+    }
+    .session-title:hover { border-bottom-color: #333345; }
+    .session-title:focus { border-bottom-color: #a78bfa; }
+
+    .session-meta {
+      font-size: 13px;
+      color: #666680;
+    }
+
+    .header-right { flex-shrink: 0; }
+
+    .restore-btn {
+      padding: 11px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .restore-btn:hover {
+      box-shadow: 0 4px 20px rgba(167,139,250,0.35);
+      transform: translateY(-1px);
+    }
+
+    .section { margin-bottom: 32px; }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: #a78bfa;
+      margin-bottom: 14px;
+    }
+
+    .tab-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .tab-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .tab-item:hover {
+      border-color: rgba(167,139,250,0.3);
+      background: rgba(167,139,250,0.04);
+    }
+    .tab-item.important { border-left: 2px solid rgba(167,139,250,0.5); }
+
+    .tab-favicon {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .tab-info { flex: 1; min-width: 0; }
+    .tab-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #e0e0e8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab-domain {
+      font-size: 11px;
+      color: #555568;
+      margin-top: 1px;
+    }
+    .tab-star {
+      font-size: 11px;
+      color: #a78bfa;
+      flex-shrink: 0;
+    }
+
+    .summary-content {
+      font-size: 14px;
+      line-height: 1.75;
+      color: #d0d0dc;
+    }
+    .summary-content h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #c4b5fd;
+      margin: 24px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(167,139,250,0.15);
+    }
+    .summary-content h2:first-child { margin-top: 0; }
+    .summary-content h3 { font-size: 14px; font-weight: 600; color: #c4b5fd; margin: 16px 0 6px; }
+    .summary-content h4 { font-size: 13px; font-weight: 600; color: #a78bfa; margin: 12px 0 5px; }
+    .summary-content p { margin: 8px 0; }
+    .summary-content ul, .summary-content ol { margin: 8px 0; padding-left: 22px; }
+    .summary-content li { margin: 5px 0; }
+    .summary-content strong { color: #e8e8f0; font-weight: 600; }
+    .summary-content em { color: #b0b0c8; }
+    .summary-content code {
+      font-size: 12.5px;
+      background: rgba(167,139,250,0.1);
+      color: #c4b5fd;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+    .summary-content hr {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 16px 0;
+    }
+
+    .loading-state, .error-state {
+      text-align: center;
+      padding: 80px 20px;
+      font-size: 14px;
+      color: #666680;
+    }
+    .error-state { color: #ff6b6b; }
+
+    .page-footer {
+      margin-top: 56px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 11px;
+      color: #444455;
+      display: flex;
+      justify-content: space-between;
+    }
+    .page-footer a { color: #a78bfa; text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="page" id="page">
+    <div class="loading-state">Loading session...</div>
+  </div>
+  <script src="session.js"></script>
+</body>
+</html>
