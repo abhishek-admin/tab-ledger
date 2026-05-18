@@ -100,6 +100,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loadingText) loadingText.textContent = text;
   }
 
+  // ---- Session badge count ----
+
+  function updateSessionsBadge() {
+    chrome.storage.local.get(['tab_sessions'], (data) => {
+      const count = (data.tab_sessions || []).length;
+      const badge = document.getElementById('sessions-badge');
+      if (badge) badge.textContent = count > 0 ? count : '';
+    });
+  }
+
+  updateSessionsBadge();
+
   // ---- Restore cache on popup open ----
 
   chrome.storage.session.get(['cached_result', 'cached_at'], (data) => {
@@ -164,7 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderSessions(sessions) {
     if (!sessions.length) {
-      sessionsList.innerHTML = '<p class="sessions-empty">No saved sessions yet.<br>Click Analyze to capture your first session.</p>';
+      sessionsList.innerHTML = `<div class="sessions-empty">
+        <span class="sessions-empty-icon">📒</span>
+        <strong>No saved sessions yet</strong>
+        Analyze your open tabs to capture your first session — it logs what you were working on and lets you restore it anytime.
+      </div>`;
       return;
     }
     sessionsList.innerHTML = sessions.map(s => {
@@ -172,8 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const preview = (s.importantTabs || []).slice(0, 2).map(t => `• ${escHtml(t.title || t.domain)}`).join('<br>');
       return `
         <div class="session-card" data-id="${s.id}">
-          <div class="session-name">${escHtml(s.name)}</div>
-          <div class="session-meta">${s.tabCount} tabs · ${date}</div>
+          <div class="session-name-row">
+            <div class="session-name">${escHtml(s.name)}</div>
+            <span class="session-tab-count">${s.tabCount} tabs</span>
+          </div>
+          <div class="session-meta">${date}</div>
           ${preview ? `<div class="session-preview">${preview}</div>` : ''}
           <div class="session-btns">
             <button class="btn-restore" data-id="${s.id}">↩ Restore Tabs</button>
@@ -352,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         await saveSession(session);
+        updateSessionsBadge();
         saveToastText.textContent = `Saved as "${session.name}"`;
         saveToast.classList.remove('hidden');
       });
