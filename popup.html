@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="popup.css">
   <style>
     :root {
-      --accent: #a78bfa;
+      --accent: #22d3ee;
     }
 
     .nav-tabs {
@@ -313,20 +313,24 @@
     </div>
 
     <!-- First-run Onboarding -->
-    <div id="onboarding" class="hidden">
-      <p style="font-size:14px;font-weight:600;color:#e0e0e8;margin-bottom:8px;">👋 Welcome! Add your API key</p>
-      <p style="font-size:12px;color:#8888a0;line-height:1.6;margin-bottom:14px;">Enter a <strong style="color:#b0b0c8;">Gemini</strong> or <strong style="color:#b0b0c8;">OpenRouter</strong> key to get started. Either one works — you don't need both.</p>
-      <label class="settings-label">Gemini API Key <span class="settings-hint">— <a href="https://aistudio.google.com/app/apikey" target="_blank">Get free key ↗</a></span></label>
-      <div class="settings-row">
-        <input type="password" id="onboard-gemini-input" class="settings-input" placeholder="AIza..." />
-        <button id="onboard-toggle-gemini" class="toggle-vis-btn">👁</button>
+    <div id="onboarding" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
+      <p style="font-size:15px;font-weight:700;color:#e0e0e8;">👋 Welcome! Add your API key</p>
+      <p style="font-size:12px;color:#8888a0;line-height:1.65;">Enter a <strong style="color:#c8c8dc;">Gemini</strong> or <strong style="color:#c8c8dc;">OpenRouter</strong> key to get started. Either one works — you don't need both.</p>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <label class="settings-label">Gemini API Key <span class="settings-hint">— <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#22d3ee;text-decoration:none;">Get free key ↗</a></span></label>
+        <div class="settings-row">
+          <input type="password" id="onboard-gemini-input" class="settings-input" placeholder="AIza..." />
+          <button id="onboard-toggle-gemini" class="toggle-vis-btn">👁</button>
+        </div>
       </div>
-      <label class="settings-label">OpenRouter API Key <span class="settings-hint">— <a href="https://openrouter.ai/keys" target="_blank">Get key ↗</a></span></label>
-      <div class="settings-row">
-        <input type="password" id="onboard-openrouter-input" class="settings-input" placeholder="sk-or-..." />
-        <button id="onboard-toggle-openrouter" class="toggle-vis-btn">👁</button>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <label class="settings-label">OpenRouter API Key <span class="settings-hint">— <a href="https://openrouter.ai/keys" target="_blank" style="color:#22d3ee;text-decoration:none;">Get key ↗</a></span></label>
+        <div class="settings-row">
+          <input type="password" id="onboard-openrouter-input" class="settings-input" placeholder="sk-or-..." />
+          <button id="onboard-toggle-openrouter" class="toggle-vis-btn">👁</button>
+        </div>
       </div>
-      <button id="onboard-save-btn" class="primary-btn" style="margin-top:4px;">Get Started →</button>
+      <button id="onboard-save-btn" class="primary-btn">Get Started →</button>
     </div>
 
     <!-- Settings Panel -->

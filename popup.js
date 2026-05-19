@@ -119,15 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---- First-run onboarding ----
 
+  const navTabs = document.querySelector('.nav-tabs');
+
   function showOnboarding() {
     onboarding.classList.remove('hidden');
     analyzeView.classList.add('hidden');
     sessionsView.classList.add('hidden');
+    if (navTabs) navTabs.classList.add('hidden');
   }
 
   function hideOnboarding() {
     onboarding.classList.add('hidden');
     analyzeView.classList.remove('hidden');
+    if (navTabs) navTabs.classList.remove('hidden');
   }
 
   document.getElementById('onboard-toggle-gemini').addEventListener('click', () => {
