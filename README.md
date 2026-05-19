@@ -35,7 +35,7 @@ Most tab managers just list your tabs. Tab Ledger **understands** them.
 
 ---
 
-## Setup
+## Getting Started
 
 ### 1. Load the extension
 1. Go to `chrome://extensions`
@@ -43,10 +43,14 @@ Most tab managers just list your tabs. Tab Ledger **understands** them.
 3. Click **Load unpacked** → select the `tab-ledger` folder
 
 ### 2. Add your API key
-Click **⚙** in the extension popup and paste either:
+On first launch, the extension automatically shows a setup screen asking for your API key.
 
-- **Gemini API key** — free at [aistudio.google.com](https://aistudio.google.com)
-- **OpenRouter key** — free tier at [openrouter.ai](https://openrouter.ai) (fallback if Gemini quota hits)
+You only need **one** of the following — enter whichever you have:
+
+- **Gemini API key** — free at [aistudio.google.com](https://aistudio.google.com/apikey)
+- **OpenRouter API key** — free tier at [openrouter.ai](https://openrouter.ai)
+
+If both are saved, Gemini is used first with OpenRouter as automatic fallback when quota runs out. You can update or change keys anytime via the **⚙** icon in the popup.
 
 ---
 
