@@ -250,6 +250,30 @@
     .save-toast:not(.hidden) {
       animation: toastIn 0.25s ease forwards;
     }
+
+    .loading-timer {
+      font-size: 11px;
+      color: #44445a;
+      font-family: 'Consolas', 'Monaco', monospace;
+      margin-top: 1px;
+      letter-spacing: 0.3px;
+    }
+
+    .result-time {
+      font-size: 10px;
+      color: #44445a;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    .model-badge-row { display: flex; align-items: center; margin-bottom: 6px; }
+    .model-badge {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.6px;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-dim); border: 1px solid var(--accent-border);
+      border-radius: 4px; padding: 2px 8px;
+    }
   </style>
 </head>
 
@@ -283,11 +307,14 @@
       <div id="loading" class="hidden">
         <div class="spinner"></div>
         <p class="loading-text" id="loading-text">Scoring your tabs...</p>
+        <p class="loading-timer" id="loading-timer">0.0s</p>
       </div>
 
       <div id="result" class="hidden">
+        <div class="model-badge-row"><span class="model-badge">◉ Gemini 3.5 Flash</span></div>
         <div class="result-header">
           <span>Session Analysis</span>
+          <span id="result-time" class="result-time"></span>
           <div class="result-actions">
             <button id="copy-btn" class="copy-btn" title="Copy">📋</button>
           </div>

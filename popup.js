@@ -76,6 +76,31 @@ document.addEventListener('DOMContentLoaded', () => {
     return html;
   }
 
+  // ---- Timer ----
+
+  let _timerInterval = null;
+  let _startTime = 0;
+  const loadingTimer = document.getElementById('loading-timer');
+  const resultTime   = document.getElementById('result-time');
+
+  function startTimer() {
+    _startTime = Date.now();
+    if (loadingTimer) loadingTimer.textContent = '0.0s';
+    clearInterval(_timerInterval);
+    _timerInterval = setInterval(() => {
+      const s = ((Date.now() - _startTime) / 1000).toFixed(1);
+      if (loadingTimer) loadingTimer.textContent = s + 's';
+    }, 100);
+  }
+
+  function stopTimer() {
+    clearInterval(_timerInterval);
+    _timerInterval = null;
+    const elapsed = ((Date.now() - _startTime) / 1000).toFixed(1);
+    if (resultTime) resultTime.textContent = elapsed + 's';
+    return elapsed;
+  }
+
   // ---- UI State Machine ----
 
   function showState(state) {
@@ -90,13 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function showResult(text, isProgressive = false) {
     const badge = isProgressive ? '<span class="progressive-badge">⏳ Reading important tabs...</span>' : '';
     resultContent.innerHTML = badge + renderMarkdown(text);
-    showState('result');
     if (!isProgressive) {
+      stopTimer();
       chrome.storage.session.set({ cached_result: text, cached_at: Date.now() });
+    } else {
+      if (resultTime) resultTime.textContent = '';
     }
+    showState('result');
   }
 
   function showError(msg) {
+    stopTimer();
     errorMessage.textContent = msg;
     showState('error');
   }
@@ -345,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function runAction() {
     showState('loading');
+    startTimer();
     setLoadingText('Analyzing your tabs...');
 
     try {
@@ -376,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         action: 'callGeminiBackground',
         prompt: quickPrompt,
         options: {
+          model: 'gemini-3.5-flash',
           systemInstruction: 'Analyze browser tab titles and domains. Give a sharp 3-line assessment of what the person is working on. Be specific and direct, not generic.',
           temperature: 0.3,
           maxTokens: 150,
@@ -405,6 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
         action: 'callGeminiBackground',
         prompt: fullPrompt,
         options: {
+          model: 'gemini-3.5-flash',
           systemInstruction: 'You are a productivity analyst reviewing a browser session. Give specific, useful analysis based on actual tab titles and content. Use markdown with ## sections. Be direct and actionable.',
           temperature: 0.4,
         },
